@@ -15,7 +15,8 @@ namespace PairOfEmployeesWorkingTogether.Controllers
         }
 
         [HttpPost]
-        public IActionResult GetProjectEmployees([FromBody] IFormFile csvFile)
+        [Route("get")]
+        public IActionResult GetProjectEmployees([FromForm] IFormFile csvFile)
         {
             if (csvFile == null || csvFile.Length == 0)
             {

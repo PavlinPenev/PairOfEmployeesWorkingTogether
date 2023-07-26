@@ -1,4 +1,5 @@
 ﻿using CsvHelper;
+using PairOfEmployeesWorkingTogether.Services.Csv_Configuration;
 using PairOfEmployeesWorkingTogether.Services.Models;
 using System.Globalization;
 
@@ -18,9 +19,15 @@ namespace PairOfEmployeesWorkingTogether.Services.EmployeesService
                 {
                     using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
                     {
+                        csv.Context.RegisterClassMap<ProjectEmployeeMap>();
                         projectEmployees = csv.GetRecords<ProjectEmployee>().ToList();
                     }
                 }
+            }
+
+            foreach (var projectEmployee in projectEmployees)
+            {
+                projectEmployee.DateTo = projectEmployee.DateTo.HasValue ? projectEmployee.DateTo : DateTime.UtcNow;
             }
 
             var groupedProjects = projectEmployees
@@ -30,40 +37,61 @@ namespace PairOfEmployeesWorkingTogether.Services.EmployeesService
 
             foreach (var group in groupedProjects)
             {
-                var projects = group.ToList();
-
-                projects.OrderBy(x => x.DateFrom);
-
-                int maxDuration = 0;
-                int emp1 = projects[0].EmployeeID;
-                int emp2 = projects[1].EmployeeID;
-
-                for (int i = 1; i < projects.Count; i++)
+                if (group.Count() > 1)
                 {
-                    int duration = (projects[i].DateTo ?? DateTime.UtcNow).Subtract(projects[i - 1].DateFrom).Days;
+                    var projects = group.ToList();
 
-                    if (duration > maxDuration)
+                    var commonDaysWorked = 0;
+                    var emp1 = projects[0].EmpID;
+                    var emp2 = projects[1].EmpID;
+
+                    for (int i = 0; i < projects.Count; i++)
                     {
-                        maxDuration = duration;
-                        emp1 = projects[i - 1].EmployeeID;
-                        emp2 = projects[i].EmployeeID;
+                        var firstEmployee = projects[i];
+
+                        for (int j = 0; j < projects.Count; j++)
+                        {
+                            if (j != i)
+                            {
+                                var secondEmployee = projects[j];
+
+                                var workIntersectionStart = firstEmployee.DateFrom > secondEmployee.DateFrom ? firstEmployee.DateFrom : secondEmployee.DateFrom;
+                                var workIntersectionEnd = firstEmployee.DateTo < secondEmployee.DateTo ? firstEmployee.DateTo : secondEmployee.DateTo;
+
+                                if (workIntersectionEnd >= workIntersectionStart)
+                                {
+                                    var currentCommonDays = Math.Abs((workIntersectionEnd.Value - workIntersectionStart).Days);
+
+                                    if (currentCommonDays > commonDaysWorked)
+                                    {
+                                        commonDaysWorked = currentCommonDays;
+
+                                        emp1 = firstEmployee.EmpID;
+                                        emp2 = secondEmployee.EmpID;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    var employeePair = new EmployeePair
+                    {
+                        FirstEmployeeId = emp1,
+                        SecondEmployeeId = emp2,
+                        DaysWorkedTogether = commonDaysWorked
+                    };
+
+                    var employeeProjectTableData = new EmployeeProjectTableData
+                    {
+                        ProjectId = group.Key,
+                        Employees = employeePair
+                    };
+
+                    if (employeePair.DaysWorkedTogether > 0)
+                    {
+                        longestCommonProjects.Add(employeeProjectTableData);
                     }
                 }
-
-                var employeePair = new EmployeePair
-                {
-                    FirstEmployeeId = emp1,
-                    SecondEmployeeId = emp2,
-                    DaysWorked = maxDuration
-                };
-
-                var employeeProjectTableData = new EmployeeProjectTableData
-                {
-                    ProjectId = group.Key,
-                    Employees = employeePair
-                };
-
-                longestCommonProjects.Add(employeeProjectTableData);
             }
 
             return longestCommonProjects;

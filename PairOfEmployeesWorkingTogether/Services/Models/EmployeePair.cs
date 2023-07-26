@@ -6,6 +6,6 @@
 
         public int SecondEmployeeId { get; set; }
 
-        public int DaysWorked { get; set; }
+        public int DaysWorkedTogether { get; set; }
     }
 }

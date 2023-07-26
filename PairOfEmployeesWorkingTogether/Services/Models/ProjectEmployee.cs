@@ -2,7 +2,7 @@
 {
     public class ProjectEmployee
     {
-        public int EmployeeID { get; set; }
+        public int EmpID { get; set; }
 
         public int ProjectID { get; set; }
 

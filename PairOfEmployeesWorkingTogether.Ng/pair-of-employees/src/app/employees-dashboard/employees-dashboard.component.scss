@@ -1,0 +1,40 @@
+nav {
+    height: 50px;
+    display: flex;
+    align-items: center;
+
+    h1 {
+        margin-left: 20px;
+        margin-bottom: 0;
+    }
+
+    border-bottom: 2px solid rgba(0,0,0, 0.3);
+}
+
+.button-wrapper {
+    height: 100px;
+    padding-left: 50px;
+    display: flex;
+    align-items: center;
+}
+
+.table-wrapper {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    
+    .inner-wrapper {
+        width: 50%;
+    }
+}
+
+mat-header-cell, mat-cell {
+    border: solid 1px rgba(0,0,0, 0.3) !important;
+}
+
+.empty-state {
+    text-align: center;
+}

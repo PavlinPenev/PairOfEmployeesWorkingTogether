@@ -1,0 +1,51 @@
+<nav>
+    <h1>{{textConstants.EMPLOYEES}}</h1>
+</nav>
+<div class="button-wrapper">
+    <input #csvInput hidden="true" type="file" onclick="this.value=null" (change)="csvInputChange($event)" accept=".csv"/>
+    <button mat-raised-button color="primary" (click)="csvInput.click()">{{textConstants.SELECT_FILE}}</button>
+</div>
+<div class="table-wrapper">
+    <div class="inner-wrapper">
+        <mat-table
+        [dataSource]="dataSource">
+        <!-- Employee 1 ID -->
+        <ng-container [matColumnDef]="'firstEmployeeId'">
+            <mat-header-cell *matHeaderCellDef>{{textConstants.FIRST_EMPLOYEE_ID}}</mat-header-cell>
+            <mat-cell *matCellDef="let employeeProject">
+                {{employeeProject.employees.firstEmployeeId}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Employee 2 ID -->
+        <ng-container [matColumnDef]="'secondEmployeeId'">
+            <mat-header-cell *matHeaderCellDef>{{textConstants.SECOND_EMPLOYEE_ID}}</mat-header-cell>
+            <mat-cell *matCellDef="let employeeProject">
+                {{employeeProject.employees.secondEmployeeId}}
+            </mat-cell>
+        </ng-container>
+
+        <!-- Project ID -->
+        <ng-container [matColumnDef]="'projectId'">
+            <mat-header-cell *matHeaderCellDef>{{textConstants.PROJECT_ID}}</mat-header-cell>
+            <mat-cell *matCellDef="let employeeProject">
+                {{employeeProject.projectId}}
+            </mat-cell>
+        </ng-container>
+        
+        <!-- Days Worked First -->
+        <ng-container [matColumnDef]="'daysWorkedTogether'">
+            <mat-header-cell *matHeaderCellDef>{{textConstants.DAYS_WORKED}}</mat-header-cell>
+            <mat-cell *matCellDef="let employeeProject">
+                {{employeeProject.employees.daysWorkedTogether}}
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns" class="table-row"></mat-row>
+        </mat-table>
+        <div *ngIf="dataSource.data.length === 0 && employeesLoaded" class="empty-state">
+            {{ textConstants.NO_EMPLOYEES_FOUND }}
+        </div>
+    </div>
+</div>
