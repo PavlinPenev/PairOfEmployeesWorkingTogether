@@ -54,24 +54,26 @@ namespace PairOfEmployeesWorkingTogether.Services.EmployeesService
 
                     for (int j = 0; j < projects.Count; j++)
                     {
-                        if (j != i)
+                        if (j == i)
                         {
-                            var secondEmployee = projects[j];
+                            continue;
+                        }
 
-                            var workIntersectionStart = firstEmployee.DateFrom > secondEmployee.DateFrom ? firstEmployee.DateFrom : secondEmployee.DateFrom;
-                            var workIntersectionEnd = firstEmployee.DateTo < secondEmployee.DateTo ? firstEmployee.DateTo : secondEmployee.DateTo;
+                        var secondEmployee = projects[j];
 
-                            if (workIntersectionEnd >= workIntersectionStart)
+                        var workIntersectionStart = firstEmployee.DateFrom > secondEmployee.DateFrom ? firstEmployee.DateFrom : secondEmployee.DateFrom;
+                        var workIntersectionEnd = firstEmployee.DateTo < secondEmployee.DateTo ? firstEmployee.DateTo : secondEmployee.DateTo;
+
+                        if (workIntersectionEnd >= workIntersectionStart)
+                        {
+                            var currentCommonDays = (workIntersectionEnd.Value - workIntersectionStart).Days;
+
+                            if (currentCommonDays > commonDaysWorked)
                             {
-                                var currentCommonDays = (workIntersectionEnd.Value - workIntersectionStart).Days;
+                                commonDaysWorked = currentCommonDays;
 
-                                if (currentCommonDays > commonDaysWorked)
-                                {
-                                    commonDaysWorked = currentCommonDays;
-
-                                    emp1 = firstEmployee.EmpID;
-                                    emp2 = secondEmployee.EmpID;
-                                }
+                                emp1 = firstEmployee.EmpID;
+                                emp2 = secondEmployee.EmpID;
                             }
                         }
                     }
