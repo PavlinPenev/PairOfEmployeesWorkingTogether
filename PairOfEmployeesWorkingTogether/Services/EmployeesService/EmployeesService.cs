@@ -63,7 +63,7 @@ namespace PairOfEmployeesWorkingTogether.Services.EmployeesService
 
                             if (workIntersectionEnd >= workIntersectionStart)
                             {
-                                var currentCommonDays = Math.Abs((workIntersectionEnd.Value - workIntersectionStart).Days);
+                                var currentCommonDays = (workIntersectionEnd.Value - workIntersectionStart).Days;
 
                                 if (currentCommonDays > commonDaysWorked)
                                 {
