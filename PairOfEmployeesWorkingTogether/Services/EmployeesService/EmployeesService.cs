@@ -37,60 +37,62 @@ namespace PairOfEmployeesWorkingTogether.Services.EmployeesService
 
             foreach (var group in groupedProjects)
             {
-                if (group.Count() > 1)
+                if (group.Count() <= 1)
                 {
-                    var projects = group.ToList();
+                    continue;
+                }
+                    
+                var projects = group.ToList();
 
-                    var commonDaysWorked = 0;
-                    var emp1 = projects[0].EmpID;
-                    var emp2 = projects[1].EmpID;
+                var commonDaysWorked = 0;
+                var emp1 = projects[0].EmpID;
+                var emp2 = projects[1].EmpID;
 
-                    for (int i = 0; i < projects.Count; i++)
+                for (int i = 0; i < projects.Count; i++)
+                {
+                    var firstEmployee = projects[i];
+
+                    for (int j = 0; j < projects.Count; j++)
                     {
-                        var firstEmployee = projects[i];
-
-                        for (int j = 0; j < projects.Count; j++)
+                        if (j != i)
                         {
-                            if (j != i)
+                            var secondEmployee = projects[j];
+
+                            var workIntersectionStart = firstEmployee.DateFrom > secondEmployee.DateFrom ? firstEmployee.DateFrom : secondEmployee.DateFrom;
+                            var workIntersectionEnd = firstEmployee.DateTo < secondEmployee.DateTo ? firstEmployee.DateTo : secondEmployee.DateTo;
+
+                            if (workIntersectionEnd >= workIntersectionStart)
                             {
-                                var secondEmployee = projects[j];
+                                var currentCommonDays = Math.Abs((workIntersectionEnd.Value - workIntersectionStart).Days);
 
-                                var workIntersectionStart = firstEmployee.DateFrom > secondEmployee.DateFrom ? firstEmployee.DateFrom : secondEmployee.DateFrom;
-                                var workIntersectionEnd = firstEmployee.DateTo < secondEmployee.DateTo ? firstEmployee.DateTo : secondEmployee.DateTo;
-
-                                if (workIntersectionEnd >= workIntersectionStart)
+                                if (currentCommonDays > commonDaysWorked)
                                 {
-                                    var currentCommonDays = Math.Abs((workIntersectionEnd.Value - workIntersectionStart).Days);
+                                    commonDaysWorked = currentCommonDays;
 
-                                    if (currentCommonDays > commonDaysWorked)
-                                    {
-                                        commonDaysWorked = currentCommonDays;
-
-                                        emp1 = firstEmployee.EmpID;
-                                        emp2 = secondEmployee.EmpID;
-                                    }
+                                    emp1 = firstEmployee.EmpID;
+                                    emp2 = secondEmployee.EmpID;
                                 }
                             }
                         }
                     }
+                }
 
-                    var employeePair = new EmployeePair
-                    {
-                        FirstEmployeeId = emp1,
-                        SecondEmployeeId = emp2,
-                        DaysWorkedTogether = commonDaysWorked
-                    };
+                var employeePair = new EmployeePair
+                {
+                    FirstEmployeeId = emp1,
+                    SecondEmployeeId = emp2,
+                    DaysWorkedTogether = commonDaysWorked
+                };
 
-                    var employeeProjectTableData = new EmployeeProjectTableData
-                    {
-                        ProjectId = group.Key,
-                        Employees = employeePair
-                    };
+                var employeeProjectTableData = new EmployeeProjectTableData
+                {
+                    ProjectId = group.Key,
+                    Employees = employeePair
+                };
 
-                    if (employeePair.DaysWorkedTogether > 0)
-                    {
-                        longestCommonProjects.Add(employeeProjectTableData);
-                    }
+                if (employeePair.DaysWorkedTogether > 0)
+                {
+                    longestCommonProjects.Add(employeeProjectTableData);
                 }
             }
 
